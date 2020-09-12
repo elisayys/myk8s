@@ -24,15 +24,14 @@ pipeline {
             }
           }
         } 
-        stage('Build docker 镜像') {
+        stage("deploy to product") {
+          when {
+            branch 'product'
             steps {
-                sh "/root/script/build-image.sh"
-            } 
-        stage('K8S 应用新镜像') {
-            steps {
-                sh "/root/script/deploy.sh"
-            }        
-
+              echo 'deploy to product'
+            }
+          }
+        } 
+          
     }
 }
-
