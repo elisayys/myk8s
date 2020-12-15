@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: busybox-dp
+spec:
+  selector:
+    matchLabels:
+      app: busybox
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: busybox 
+    spec:
+      containers:
+      - image: busybox:1.28
+        imagePullPolicy: IfNotPresent
+        args: ["/bin/sh","-c","touch /tmp/healthy;sleep 60;rm -rf /tmp/healthy; sleep 6000"]
+        name: busyboxpod
+        resources:
+          limits:
+            cpu: 100m
+          requests:
+            cpu: 10m
+        volumeMounts:
+        - name: config-volume
+          mountPath: /config/nginx/
+        - name: config-volume2
+          mountPath: /etc/config 
+      volumes:
+        - name: config-volume
+          configMap:
+           name: nginxcm #configmap 的名字
+           volumes:
+        - name: config-volume2
+          configMap:
+            # Provide the name of the ConfigMap containing the files you want
+            # to add to the container
+            name: special-config
+            items:
+              - key: SPECIAL_LEVEL
+                path: keypath #这样会生成名字叫 keypath 的文件
+              - key: SPECIAL_TYPE #必须要存在这个key，要不pod 起不来！
+                path: typepath 
+

@@ -1,0 +1,31 @@
+apiVersion: settings.k8s.io/v1alpha1
+kind: PodPreset
+metadata:
+  name: time
+spec:
+#  selector:
+#    matchLabels:
+#      role: frontend
+  env:
+    - name: LANG
+      value: "C.UTF-8"
+  volumeMounts:
+    - mountPath: /usr/share/zoneinfo/Asia/Shanghai
+      name: tz-config
+      readOnly: true
+    - mountPath: /etc/localtime
+      name: tz-config2
+      readOnly: true
+    - mountPath: /etc/timezone
+      name: timezone
+      readOnly: true
+  volumes:
+    - name: tz-config2
+      hostPath:
+       path: /usr/share/zoneinfo/Asia/Shanghai
+    - name: tz-config
+      hostPath:
+       path: /usr/share/zoneinfo/Asia/Shanghai
+    - name: timezone
+      hostPath:
+       path: /etc/timezone

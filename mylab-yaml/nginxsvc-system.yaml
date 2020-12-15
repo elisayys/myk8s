@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: nginx-svc
+  name: nginx-svc
+  namespace: kube-system 
+spec:
+  clusterIP: None
+  ports:
+  - name: http # Service端口的名称
+    port: 80 # Service自己的端口, servicea --> serviceb http://serviceb,  http://serviceb:8080 
+    protocol: TCP # UDP TCP SCTP default: TCP
+    targetPort: 80 # 后端应用的端口
+  - name: https
+    port: 443
+    protocol: TCP
+    targetPort: 443
+  selector:
+    app: nginx
+  sessionAffinity: None
+  type: ClusterIP

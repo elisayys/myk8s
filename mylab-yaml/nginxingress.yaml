@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1beta1 # networking.k8s.io/v1 / extensions/v1beta1 
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+  name: example-ingress
+spec:
+  rules: # 一个Ingress可以配置多个rules
+  - host: foo.bar.com # 域名配置，可以不写，匹配*， *.bar.com
+    http:
+      paths: # 相当于nginx的location配合，同一个host可以配置多个path / /abc
+      - backend:
+          serviceName: nginx-svc 
+          servicePort: 80
+        path: /
+  - host: foo2.bar.com # 域名配置，可以不写，匹配*， *.bar.com
+    http:
+      paths: # 相当于nginx的location配合，同一个host可以配置多个path / /abc
+      - backend:
+          serviceName: nginx-external
+          servicePort: 80
+        path: /

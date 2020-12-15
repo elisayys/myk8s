@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-dp
+  namespace: kube-system  
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - busybox
+            namespaces:
+              - default
+            topologyKey: kubernetes.io/hostname 
+      containers:
+      - image: nginx:1.15.3
+        imagePullPolicy: IfNotPresent
+        name: nginx
+        resources:
+          limits:
+            cpu: 100m
+          requests:
+            cpu: 10m
+  

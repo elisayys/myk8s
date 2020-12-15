@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nfs-pvc01
+  namespace: default
+  labels: # 这些labels可以不定义
+    name: nfs-pvc01
+    storetype: nfs
+    capacity: 100Mi
+spec:
+  storageClassName: nfs-slow   #这个要和pv 这个字段一样才行。
+  accessModes:  # PVC也需要定义访问模式，不过它的模式一定是和现有PV相同或者是它的子集，否则匹配不到PV
+  - ReadWriteMany
+  resources: # 定义资源要求PV满足这个PVC的要求才会被匹配到
+    requests:
+      storage: 40Mi  # 定义要求有多大空间

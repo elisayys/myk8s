@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-dp
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - busybox
+            namespaces:
+              - default
+            topologyKey: kubernetes.io/hostname 
+      containers:
+      - image: nginx:1.15.3
+        imagePullPolicy: IfNotPresent
+        name: nginx
+        resources:
+          limits:
+            cpu: 100m
+          requests:
+            cpu: 10m
+        env:
+        - name: WORDPRESS_DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: mysecret
+              key: username
+        - name: WORDPRESS_DB_PASSWORD  #进入容器里面env 可以看到这个。
+          valueFrom:
+            secretKeyRef:
+              name: mysecret
+              key: password    
+        volumeMounts:
+        - name: config-volume    #这个名字必须在volumes 里面有定义
+          mountPath: /etc/nginx/nginx.conf #会创建一个config 文件夹
+          subPath: etc/nginx/nginx.conf   # etc前面不能有 / 
+        - name: nfs-pv01
+          mountPath: "/opt"
+      tolerations:
+      - effect: NoSchedule
+        key: node-test
+        operator: Exists
+      volumes:
+      - name: config-volume
+        configMap:
+          items:
+          - key: nginx.conf # 通过describe cm xx 看的key
+            path: etc/nginx/nginx.conf
+          name: nginxcm # configmap 的名字
+      - name: nfs-pv01
+        persistentVolumeClaim:
+          claimName: nfs-pvc01
